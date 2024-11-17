@@ -4,15 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Login</h1>
-    <form action="{{ url_for('login') }}" method="post">
-        <label>Username:</label>
-        <input type="text" name="username" required><br>
-        <label>Password:</label>
-        <input type="password" name="password" required><br>
-        <button type="submit">Login</button>
-    </form>
+<body class="bg-gray-100 h-screen flex items-center justify-center">
+
+    <!-- Login Form Container -->
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">
+        
+        <!-- Heading -->
+        <h2 class="text-2xl font-semibold text-center text-gray-800 mb-6">Login to Your Account</h2>
+
+        <!-- Form Start -->
+        <form action="{{ url_for('login') }}" method="post" class="space-y-4">
+
+            <!-- Username Field -->
+            <div>
+                <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                <input type="text" name="username" id="username" required class="mt-2 p-3 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your username">
+            </div>
+
+            <!-- Password Field -->
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                <input type="password" name="password" id="password" required class="mt-2 p-3 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your password">
+            </div>
+
+            <!-- Submit Button -->
+            <div>
+                <button type="submit" class="w-full py-3 bg-blue-500 text-white rounded-lg text-lg font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Login</button>
+            </div>
+
+        </form>
+
+        <!-- Alternative Actions -->
+        <div class="mt-4 text-center">
+            <p class="text-sm text-gray-500">Don't have an account? <a href="#" class="text-blue-500 hover:underline">Sign up</a></p>
+        </div>
+    </div>
+
 </body>
 </html>

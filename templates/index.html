@@ -4,10 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to Chat App</title>
+    <!-- Add Tailwind CSS from CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Welcome to the Chat App</h1>
-    <a href="{{ url_for('login') }}">Login</a> | 
-    <a href="{{ url_for('register') }}">Register</a>
+<body class="bg-gray-50 font-sans">
+
+    <div class="min-h-screen flex flex-col justify-center items-center">
+        <!-- Main container -->
+        <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-lg">
+            <h1 class="text-4xl font-semibold text-center text-gray-800 mb-6">Welcome to the Chat App</h1>
+
+            <div class="text-center">
+                <p class="text-gray-600 mb-4">Please choose an option to continue:</p>
+
+                <!-- Buttons for Login, Register, and Open Chat -->
+                <div class="space-y-4">
+                    <a href="{{ url_for('login') }}" class="w-full block bg-blue-500 text-white text-lg font-medium py-2 rounded-lg hover:bg-blue-600 transition duration-200">Login</a>
+                    <a href="{{ url_for('register') }}" class="w-full block bg-green-500 text-white text-lg font-medium py-2 rounded-lg hover:bg-green-600 transition duration-200">Register</a>
+                    <a href="{{ url_for('chat') }}" class="w-full block bg-gray-500 text-white text-lg font-medium py-2 rounded-lg hover:bg-gray-600 transition duration-200">Open Chat 💬</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

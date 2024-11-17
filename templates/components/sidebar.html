@@ -1,0 +1,32 @@
+<!-- sidebar.html -->
+<div class="w-1/4 bg-white border-r border-gray-200 p-4 relative">
+    <h2 class="text-xl font-bold mb-4">Channels</h2>
+    <div class="space-y-4">
+        {% for channel in channels %}
+        <a href="{{ url_for('chat_channel', uuid=channel.uuid) }}">
+            <div class="flex items-center p-2 hover:bg-gray-100 rounded cursor-pointer 
+                        {% if channel.uuid == uuid %} bg-blue-200 {% endif %}">
+                <div class="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center text-white font-semibold">
+                    {{ channel.name[0] }}  <!-- Display the first letter of the channel name -->
+                </div>
+                <div class="ml-3">
+                    <p class="font-semibold">{{ channel.name }}</p>
+                    <p class="text-xs text-gray-500">Last message here...</p>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Floating Profile Settings Button (bottom left) -->
+    <a href="{{ url_for('chat') }}" class="absolute bottom-5 left-5 bg-gray-200 text-black p-4 rounded-lg flex items-center justify-center hover:bg-gray-600">
+        <span class="sr-only">Profile Settings</span>
+        <i class="fas fa-cog text-xl"></i>  <!-- Settings icon -->
+    </a>
+    
+    <!-- Floating Create Channel Button (bottom right) -->
+    <a href="{{ url_for('chat') }}" class="absolute bottom-5 right-5 bg-blue-600 text-white p-4 rounded-lg flex items-center justify-center hover:bg-blue-500">
+        <span class="sr-only">Create Channel</span>
+        <i class="fas fa-plus text-xl"></i>  <!-- Plus icon for create channel -->
+    </a>
+</div>

@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
+import requests
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Set a secret key for session management
@@ -6,15 +7,12 @@ app.secret_key = 'your_secret_key'  # Set a secret key for session management
 # In-memory 'user database' for demo purposes
 users = {"user": "password"}  # Replace with a real user database in production
 
-# Sample list of contacts
-contacts = ["Alice", "Bob", "Charlie"]
+# Example list of contacts (replace with real data if needed)
+contacts = ["Alice", "Bob", "Charlie", "David", "Eva"]
 
 @app.route('/')
 def home():
-    # If the user is logged in, show the chat interface
-    if 'username' in session:
-        return render_template('chat.html', contacts=contacts, username=session['username'])
-    return render_template('index.html')  # Show login/register page if not logged in
+    return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -51,17 +49,37 @@ def register():
 
     return render_template('register.html')  # Show registration form if not POST
 
-@app.route('/chat/<contact>', methods=['GET', 'POST'])
-def chat(contact):
+
+@app.route('/chat')
+def chat():
+    cursor = request.args.get('cursor', 0, type=int)
+    response = requests.get(f'http://localhost:2020/channels?cursor={cursor}')
+    data = response.json()
+    channels = data['items']
+    next_page = data.get('next')
+
+    return render_template('chat.html', channels=channels, next_page=next_page)
+
+@app.route('/chat/<uuid>', methods=['GET', 'POST'])
+def chat_channel(uuid):
     # Only allow access if logged in
     if 'username' not in session:
         flash('Please log in to access the chat.', 'warning')
         return redirect(url_for('login'))
+   
+    cursor = request.args.get('cursor', 0, type=int)
+    response = requests.get(f'http://localhost:2020/channels?cursor={cursor}')
+    data = response.json()
+    channels = data['items']
+    next_page = data.get('next')
+
     if request.method == 'POST':
         # Handle sending messages (this can be extended with a database or other storage)
         message = request.form['message']
-        flash(f'Message sent to {contact}: {message}', 'success')
-    return render_template('chat.html', contact=contact, username=session['username'])
+        flash(f'Message sent to {channel}: {message}', 'success')
+    
+    return render_template('chat.html', uuid=uuid, username=session['username'], channels=channels)
+
 
 if __name__ == "__main__":
     app.run(debug=True)

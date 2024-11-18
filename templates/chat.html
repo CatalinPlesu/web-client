@@ -19,20 +19,14 @@
         <!-- Chat Area or Profile Page -->
         <div class="flex-1 flex flex-col">
             
-            {% if uuid %}
+            <!-- Chat Header -->
+            {% include 'components/chat_header.html' %}
 
-                <!-- Chat Header -->
-                {% include 'components/chat_header.html' %}
-
-                <!-- Messages Section if uuid is defined -->
-                {% include 'components/message_list.html' %}
-                
-                <!-- Message Input -->
-                {% include 'components/message_input.html' %}
-            {% else %}
-                <!-- Profile Section if no uuid is defined -->
-                {% include 'components/profile.html' %}
-            {% endif %}
+            <!-- Messages Section if uuid is defined -->
+            {% include 'components/message_list.html' %}
+            
+            <!-- Message Input -->
+            {% include 'components/message_input.html' %}
 
         </div>
     </div>

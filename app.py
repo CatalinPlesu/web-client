@@ -70,28 +70,55 @@ def register():
     return render_template('register.html')
 
 
-@app.route('/profile')
+@app.route('/profile', methods=['GET', 'POST'])
 def profile():
     username = request.cookies.get('username')
     jwt = request.cookies.get('jwt')
 
-    print(username, jwt)
-
     if not username or not jwt:
-        return render_template('profile.html')
+        return render_template('profile.html', user=None)
 
-    try:
-        response = requests.post(
-            "http://localhost:2020/users/auth",
-            json={"username": username, "jwt": jwt}
-        )
-        response.raise_for_status()
+    if request.method == 'GET':
+        try:
+            cursor = request.args.get('cursor', 0, type=int)
+            response = requests.get(f'http://localhost:2020/channels?cursor={cursor}')
+            data = response.json()
+            channels = data['items']
+            next_page = data.get('next')
+            response = requests.post(
+                "http://localhost:2020/users/auth",
+                json={"username": username, "jwt": jwt}
+            )
+            response.raise_for_status()
+            user_data = response.json()
+            return render_template('profile.html', user=user_data, channels=channels)
 
-        user_data = response.json()
-        return render_template('profile.html', user=user_data)
-    except requests.RequestException as e:
-        print(f"Failed to authenticate user: {e}")
-        return render_template('profile.html')
+        except requests.RequestException as e:
+            print(f"Failed to authenticate or fetch user data: {e}")
+            return render_template('profile.html', user=None)
+
+    if request.method == 'POST':
+        print('reached post')
+        updated_data = request.json
+        user_id = updated_data.get('user_id')
+        print(request)
+        try:
+            update_response = requests.put(
+                f"http://localhost:2020/users/{user_id}",
+                json={
+                    "username": updated_data["username"],
+                    "display_name": updated_data["display_name"],
+                    "email": updated_data["email"],
+                    "password": updated_data["password"]
+                }
+            )
+
+            update_response.raise_for_status()
+            return render_template('profile.html', user=updated_data)
+
+        except requests.RequestException as e:
+            print(f"Failed to update user data: {e}")
+            return render_template('profile.html', user=updated_data)
 
 
 @app.route('/chat/<uuid>', methods=['GET', 'POST'])

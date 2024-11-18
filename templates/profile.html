@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="bg-gray-100 h-screen flex">
+
+    <!-- Sidebar -->
+    {% include 'components/sidebar.html' %}
+
+    <!-- Main Content -->
+    <div class="flex-1 flex justify-center items-center p-6">
+        {% if user %}
+        <div class="w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
+            <!-- Display Username Initially -->
+            <h2 class="text-2xl font-semibold text-center mb-6" id="usernameDisplay">{{ user.username }}</h2>
+
+            <!-- Show Edit Profile Button -->
+            <button id="editButton" class="px-4 py-2 bg-blue-500 text-white rounded-lg">Edit Profile</button>
+
+            <!-- Form (Initially Hidden) -->
+            <form id="profileForm" class="space-y-4 hidden mt-6">
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                    <input type="text" id="username" name="username" value="{{ user.username }}"
+                           class="w-full mt-1 p-2 border rounded-lg focus:outline-none" disabled>
+                </div>
+                <div>
+                    <label for="displayName" class="block text-sm font-medium text-gray-700">Display Name</label>
+                    <input type="text" id="displayName" name="display_name" value="{{ user.display_name }}"
+                           class="w-full mt-1 p-2 border rounded-lg focus:outline-none" disabled>
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="email" name="email" value="{{ user.email }}"
+                           class="w-full mt-1 p-2 border rounded-lg focus:outline-none" disabled>
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                        <input type="text" id="password" name="password" value="{{ user.password }}"
+                           class="w-full mt-1 p-2 border rounded-lg focus:outline-none" disabled>
+                </div>
+
+                <div class="flex justify-between items-center mt-6">
+                    <button id="cancelButton" type="button" class="hidden px-4 py-2 bg-red-500 text-white rounded-lg">Cancel</button>
+                    <button id="saveButton" type="submit" class="hidden px-4 py-2 bg-green-500 text-white rounded-lg">Save</button>
+                </div>
+            </form>
+        </div>
+        {% else %}
+        <div class="w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-center mb-6">You are not logged in</h2>
+            <p class="text-center text-gray-500">Please log in to view and edit your profile.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        const profileForm = document.getElementById('profileForm');
+        const editButton = document.getElementById('editButton');
+        const saveButton = document.getElementById('saveButton');
+        const cancelButton = document.getElementById('cancelButton');
+        const usernameDisplay = document.getElementById('usernameDisplay');
+        const inputs = profileForm ? profileForm.querySelectorAll('input') : [];
+
+        // Handle edit button click
+        editButton.addEventListener('click', () => {
+            // Show the form
+            profileForm.classList.remove('hidden');
+            // Hide the username display and edit button
+            usernameDisplay.classList.add('hidden');
+            editButton.classList.add('hidden');
+
+            // Enable input fields
+            inputs.forEach(input => input.disabled = false);
+
+            // Show the cancel and save buttons
+            cancelButton.classList.remove('hidden');
+            saveButton.classList.remove('hidden');
+        });
+
+        // Handle cancel button click
+        cancelButton.addEventListener('click', () => {
+            // Reset form and hide it
+            profileForm.reset();
+            profileForm.classList.add('hidden');
+            // Show the username display and edit button
+            usernameDisplay.classList.remove('hidden');
+            editButton.classList.remove('hidden');
+
+            // Disable input fields
+            inputs.forEach(input => input.disabled = true);
+
+            // Hide cancel and save buttons
+            cancelButton.classList.add('hidden');
+            saveButton.classList.add('hidden');
+        });
+
+        // Handle form submission with axios
+        profileForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const updatedUserData = {
+                user_id: '{{ user.user_id }}', // Ensure user_id is properly passed
+                username: document.getElementById('username').value,
+                display_name: document.getElementById('displayName').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+
+            axios.post('/profile', updatedUserData)  // Use axios for the POST request
+                .then(response => {
+                    if (response.status === 200) {
+                        alert('Profile updated successfully!');
+                        // Hide form and show username
+                        profileForm.classList.add('hidden');
+                        usernameDisplay.classList.remove('hidden');
+                        editButton.classList.remove('hidden');
+
+                        // Disable input fields
+                        inputs.forEach(input => input.disabled = true);
+
+                        // Hide cancel and save buttons
+                        cancelButton.classList.add('hidden');
+                        saveButton.classList.add('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert('An error occurred while updating the profile.');
+                });
+        });
+    </script>
+</body>
+</html>

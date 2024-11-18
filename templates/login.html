@@ -4,44 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 h-screen flex items-center justify-center">
+<body class="bg-gray-100 flex justify-center items-center h-screen">
 
-    <!-- Login Form Container -->
-    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">
-        
-        <!-- Heading -->
-        <h2 class="text-2xl font-semibold text-center text-gray-800 mb-6">Login to Your Account</h2>
+    <!-- Login Form -->
+    <div class="w-full max-w-xs p-8 space-y-4 bg-white rounded-lg shadow-lg">
+        <h1 class="text-2xl font-bold text-center">Login</h1>
 
-        <!-- Form Start -->
-        <form action="{{ url_for('login') }}" method="post" class="space-y-4">
-
-            <!-- Username Field -->
+        <form id="loginForm" action="/login" method="POST">
             <div>
                 <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
-                <input type="text" name="username" id="username" required class="mt-2 p-3 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your username">
+                <input type="text" id="username" name="username" required
+                       class="w-full mt-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
-
-            <!-- Password Field -->
             <div>
                 <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                <input type="password" name="password" id="password" required class="mt-2 p-3 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your password">
+                <input type="password" id="password" name="password" required
+                       class="w-full mt-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
-
-            <!-- Submit Button -->
-            <div>
-                <button type="submit" class="w-full py-3 bg-blue-500 text-white rounded-lg text-lg font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Login</button>
-            </div>
-
+            <button type="submit" class="w-full mt-4 p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Login</button>
         </form>
 
-        <!-- Alternative Actions -->
-        <div class="mt-4 text-center">
-            <p class="text-sm text-gray-500">Don't have an account? <a href="#" class="text-blue-500 hover:underline">Sign up</a></p>
-        </div>
+        <p class="text-center text-sm mt-4">
+            Don't have an account? <a href="/register" class="text-blue-500 hover:underline">Register</a>
+        </p>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            axios.post('/login', {
+                username: username,
+                password: password
+            })
+            .then(function (response) {
+                if (response.status === 201) {
+                    console.log(response.data)
+                    localStorage.setItem('jwt', response.data.jwt);
+                    localStorage.setItem('username', response.data.user.username);
+                    localStorage.setItem('user_id', response.data.user.user_id);
+
+                    window.location.href = '/chat';
+                }
+            })
+            .catch(function (error) {
+                alert('Invalid credentials');
+            });
+        });
+    </script>
 </body>
 </html>

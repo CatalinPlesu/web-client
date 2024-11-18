@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logging Out...</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script>
+        // Clear localStorage when logging out
+        localStorage.removeItem('jwt');
+        localStorage.removeItem('username');
+        localStorage.removeItem('user_id');
+
+        window.location.replace("{{ url_for('home') }}");
+    </script>
+</head>
+<body class="bg-gray-100 h-screen flex justify-center items-center">
+    <div class="w-full max-w-md bg-white p-6 rounded-lg shadow-lg text-center">
+        <h2 class="text-2xl font-semibold text-gray-700 mb-4">Logging Out...</h2>
+        <p class="text-gray-500 mb-4">Please wait while we log you out.</p>
+        <div class="text-sm text-gray-400">Redirecting to the homepage...</div>
+    </div>
+</body>
+</html>
+

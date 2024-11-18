@@ -26,8 +26,19 @@
             <!-- Display Username Initially -->
             <h2 class="text-2xl font-semibold text-center mb-6" id="usernameDisplay">{{ user.username }}</h2>
 
-            <!-- Show Edit Profile Button -->
-            <button id="editButton" class="px-4 py-2 bg-blue-500 text-white rounded-lg">Edit Profile</button>
+
+            <!-- Add this section below the existing content in your profile page -->
+            <div class="flex justify-between mt-6">
+                <!-- Logout Button (Left) -->
+                <a href="{{ url_for('logout') }}" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                    Logout
+                </a>
+
+                <!-- Edit Profile Button (Right) -->
+                <button id="editButton" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                    Edit Profile
+                </button>
+            </div>
 
             <!-- Form (Initially Hidden) -->
             <form id="profileForm" class="space-y-4 hidden mt-6">
@@ -63,6 +74,9 @@
             <h2 class="text-2xl font-semibold text-center mb-6">You are not logged in</h2>
             <p class="text-center text-gray-500">Please log in to view and edit your profile.</p>
         </div>
+        <script>
+            window.location.replace("{{ url_for('home') }}");
+        </script>
         {% endif %}
     </div>
 

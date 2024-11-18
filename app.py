@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, request, redirect, url_for, session, flash, jsonify
+from flask import Flask, render_template, request, request, redirect, url_for, session, flash, jsonify, make_response
 import requests
 import json
 
@@ -47,9 +47,12 @@ def login():
 
 @app.route('/logout')
 def logout():
-    session.pop('username', None)  # Remove the username from the session
+    response = make_response(render_template('logout.html'))
+    session.pop('username', None)
+    response.set_cookie('username', '', expires=0)  # Clear the username cookie
+    response.set_cookie('jwt', '', expires=0)  # Clear the JWT cookie
     flash('Logged out successfully.', 'info')
-    return redirect(url_for('home'))  # Redirect to home after logout
+    return response
 
 
 @app.route('/register', methods=['GET', 'POST'])

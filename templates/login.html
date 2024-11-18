@@ -45,12 +45,15 @@
             })
             .then(function (response) {
                 if (response.status === 201) {
-                    console.log(response.data)
                     localStorage.setItem('jwt', response.data.jwt);
-                    localStorage.setItem('username', response.data.user.username);
-                    localStorage.setItem('user_id', response.data.user.user_id);
+                    localStorage.setItem('username', response.data.username);
+                    localStorage.setItem('user_id', response.data.user_id);
 
-                    window.location.href = '/chat';
+                    document.cookie = `jwt=${response.data.jwt}; path=/; secure; samesite=Strict`;
+                    document.cookie = `username=${response.data.username}; path=/; secure; samesite=Strict`;
+                    document.cookie = `user_id=${response.data.user_id}; path=/; secure; samesite=Strict`;
+
+                    window.location.href = '/profile';
                 }
             })
             .catch(function (error) {

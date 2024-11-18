@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from flask import Flask, render_template, request, request, redirect, url_for, session, flash, jsonify
 import requests
 import json
 
@@ -29,16 +29,16 @@ def login():
             'username': username,
             'password': password
         })
-
+        print(response.status_code)
         if response.status_code == 201:
-            print("#h", response.text)
             response_data = json.loads(response.text)
 
             user = response_data['user']
             jwt = response_data['jwt']
+
             return jsonify({
-                'username': user.username,
-                'user_id': user.user_id,
+                'username': user['username'],
+                'user_id': user['user_id'],
                 'jwt': jwt
             }), 201
         else:
@@ -70,15 +70,28 @@ def register():
     return render_template('register.html')
 
 
-@app.route('/chat')
-def chat():
-    cursor = request.args.get('cursor', 0, type=int)
-    response = requests.get(f'http://localhost:2020/channels?cursor={cursor}')
-    data = response.json()
-    channels = data['items']
-    next_page = data.get('next')
+@app.route('/profile')
+def profile():
+    username = request.cookies.get('username')
+    jwt = request.cookies.get('jwt')
 
-    return render_template('chat.html', channels=channels, next_page=next_page)
+    print(username, jwt)
+
+    if not username or not jwt:
+        return render_template('profile.html')
+
+    try:
+        response = requests.post(
+            "http://localhost:2020/users/auth",
+            json={"username": username, "jwt": jwt}
+        )
+        response.raise_for_status()
+
+        user_data = response.json()
+        return render_template('profile.html', user=user_data)
+    except requests.RequestException as e:
+        print(f"Failed to authenticate user: {e}")
+        return render_template('profile.html')
 
 
 @app.route('/chat/<uuid>', methods=['GET', 'POST'])

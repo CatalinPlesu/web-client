@@ -58,20 +58,35 @@ def logout():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        data = request.get_json()  
+        username = data.get('username')
+        display_name = data.get('display_name')
+        email = data.get('email')
+        password = data.get('password')
 
-        if username not in users:  # Check if the username already exists
-            users[username] = password  # Add new user to the 'database'
-            flash('Registration successful! Please log in.', 'success')
-            # Redirect to login page after registration
-            return redirect(url_for('login'))
+        # Send a request to the backend API to register the user
+        response = requests.post('http://localhost:2020/users/register', json={
+            'username': username,
+            'display_name': display_name,
+            'email': email,
+            'password': password
+        })
+        if response.status_code == 201:  # Success
+            response_data = json.loads(response.text)
+
+            user = response_data['user']
+            jwt = response_data['jwt']
+
+            return jsonify({
+                'username': user['username'],
+                'user_id': user['user_id'],
+                'jwt': jwt
+            }), 201
         else:
-            flash('Username already taken. Please choose another.', 'danger')
+            return jsonify({'message': 'Invalid credentials'}), 401
 
-    # Show registration form if not POST
+    # If GET method, just render the registration form
     return render_template('register.html')
-
 
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():

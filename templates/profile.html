@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/build/md5.min.js"></script> <!-- Include MD5 library -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body class="bg-gray-100 h-screen flex">
@@ -16,6 +18,11 @@
     <div class="flex-1 flex justify-center items-center p-6">
         {% if user %}
         <div class="w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
+            <!-- Gravatar Avatar -->
+            <div class="flex justify-center mb-4">
+                <img id="avatar" src="" alt="Avatar" class="w-24 h-24 rounded-full">
+            </div>
+
             <!-- Display Username Initially -->
             <h2 class="text-2xl font-semibold text-center mb-6" id="usernameDisplay">{{ user.username }}</h2>
 
@@ -60,6 +67,13 @@
     </div>
 
     <script>
+        // Get the user's email from the template and generate the Gravatar URL
+        const email = "{{ user.email }}"; // Assuming user email is available in the template
+        const gravatarUrl = "https://www.gravatar.com/avatar/" + md5(email.trim().toLowerCase()) + "?s=200"; // Gravatar URL with a size of 200px
+
+        // Set the avatar image source
+        document.getElementById("avatar").src = gravatarUrl;
+
         const profileForm = document.getElementById('profileForm');
         const editButton = document.getElementById('editButton');
         const saveButton = document.getElementById('saveButton');
@@ -105,14 +119,14 @@
             e.preventDefault();
 
             const updatedUserData = {
-                user_id: '{{ user.user_id }}', // Ensure user_id is properly passed
+                user_id: '{{ user.user_id }}',
                 username: document.getElementById('username').value,
                 display_name: document.getElementById('displayName').value,
                 email: document.getElementById('email').value,
                 password: document.getElementById('password').value
             };
 
-            axios.post('/profile', updatedUserData)  // Use axios for the POST request
+            axios.post('/profile', updatedUserData)
                 .then(response => {
                     if (response.status === 200) {
                         alert('Profile updated successfully!');
@@ -137,3 +151,4 @@
     </script>
 </body>
 </html>
+

@@ -1,11 +1,16 @@
 <!-- sidebar.html -->
 <div class="w-1/4 bg-white border-r border-gray-200 p-4 relative">
+    <!-- Search Bar -->
+    <div class="mb-4">
+        <input type="text" id="searchBar" placeholder="Search Channels..." class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </div>
+
     <h2 class="text-xl font-bold mb-4">Channels</h2>
-    <div class="space-y-4">
+    <div class="space-y-4" id="channelsList">
         {% for channel in channels %}
         <a href="{{ url_for('chat_channel', uuid=channel.uuid) }}">
             <div class="flex items-center p-2 hover:bg-gray-100 rounded cursor-pointer 
-                        {% if channel.uuid == uuid %} bg-blue-200 {% endif %}">
+                        {% if channel.uuid == uuid %} bg-blue-200 {% endif %}" data-channel-name="{{ channel.name | lower }}">
                 <div class="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center text-white font-semibold">
                     {{ channel.name[0] }}  <!-- Display the first letter of the channel name -->
                 </div>
@@ -30,3 +35,24 @@
         <i class="fas fa-plus text-xl"></i>  <!-- Plus icon for create channel -->
     </a>
 </div>
+
+<script>
+    // Get search bar and channels list
+    const searchBar = document.getElementById('searchBar');
+    const channelsList = document.getElementById('channelsList');
+    
+    // Search filter function
+    searchBar.addEventListener('input', function() {
+        const query = searchBar.value.toLowerCase();
+        const channels = channelsList.querySelectorAll('a');
+
+        channels.forEach(channel => {
+            const channelName = channel.querySelector('[data-channel-name]').dataset.channelName;
+            if (channelName.includes(query)) {
+                channel.style.display = '';  // Show channel
+            } else {
+                channel.style.display = 'none';  // Hide channel
+            }
+        });
+    });
+</script>

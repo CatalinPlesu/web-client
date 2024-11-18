@@ -138,6 +138,41 @@ def profile():
             print(f"Failed to update user data: {e}")
             return render_template('profile.html', user=updated_data)
 
+@app.route('/newchannel', methods=['GET', 'POST'])
+def newchannel():
+    if request.method == 'GET':
+        username = request.cookies.get('username')
+        jwt = request.cookies.get('jwt')
+        cursor = request.args.get('cursor', 0, type=int)
+        response = requests.get(f'http://localhost:2020/channels?cursor={cursor}')
+        data = response.json()
+        channels = data['items']
+        next_page = data.get('next')
+        response = requests.post(
+            "http://localhost:2020/users/auth",
+            json={"username": username, "jwt": jwt}
+        )
+        response.raise_for_status()
+        user_data = response.json()
+        return render_template('newchannel.html', user=user_data, channels=channels)
+
+    elif request.method == 'POST':
+        name = request.form['name']
+        is_public = 'is_private' not in request.form
+        owner_id = request.form['owner_id']
+
+        response = requests.post('http://localhost:2020/channels/', json={
+            'name': name,
+            'is_public': is_public,
+            'owner_id': owner_id,
+            'users_acces': [{'user_id': owner_id, 'is_admin': True, 'can_write': True}]
+        })
+
+        if response.status_code == 201:  # Channel created successfully
+            response_data = json.loads(response.text)
+            return redirect(url_for('chat_channel', uuid=response_data['uuid']))
+        else:
+            return redirect(url_for('newchannel'))
 
 @app.route('/chat/<uuid>', methods=['GET', 'POST'])
 def chat_channel(uuid):

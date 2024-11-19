@@ -181,18 +181,49 @@ def chat_channel(uuid):
         flash('Please log in to access the chat.', 'warning')
         return redirect(url_for('login'))
 
+    # Fetch channels
     cursor = request.args.get('cursor', 0, type=int)
     response = requests.get(f'http://localhost:2020/channels?cursor={cursor}')
     data = response.json()
     channels = data['items']
     next_page = data.get('next')
 
-    if request.method == 'POST':
-        # Handle sending messages (this can be extended with a database or other storage)
-        message = request.form['message']
-        flash(f'Message sent to {channel}: {message}', 'success')
+    # Fetch current channel details
+    response = requests.get(f'http://localhost:2020/channels/{uuid}')
+    current_channel = response.json()
 
-    return render_template('chat.html', uuid=uuid, username=session['username'], channels=channels)
+    # Fetch messages for the channel
+    response = requests.get(f'http://localhost:2020/messages/channel/{uuid}')
+    messages = response.json().get('items', [])
+    
+    # Fetch user data for each message
+    
+    # Fetch user data and update the messages directly
+    seen_users = {}
+    for i in range(len(messages)):
+        user_id = messages[i]['UserID']
+        if user_id not in seen_users:  # Avoid duplicate requests for the same user
+            user_response = requests.get(f'http://localhost:2020/users/{user_id}')
+            if user_response.status_code == 200:
+                seen_users[user_id] = user_response.json().get('username', 'Unknown')
+            else:
+                seen_users[user_id] = 'Unknown'
+        # Update the message with the username
+        messages[i]['username'] = seen_users[user_id]
+
+    # Handle form submission for sending a new message
+    if request.method == 'POST':
+        message_text = request.form['message']
+        flash(f'Message sent to {current_channel["name"]}: {message_text}', 'success')
+
+    return render_template(
+        'chat.html',
+        uuid=uuid,
+        username=session['username'],
+        channels=channels,
+        current_channel=current_channel,
+        messages=messages
+    )
 
 
 if __name__ == "__main__":

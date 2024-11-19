@@ -1,27 +1,34 @@
-<div class="flex-1 p-4 overflow-y-auto space-y-4">
-    <!-- Message from Another User -->
-    <div class="flex items-start mb-4">
-        <div class="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center text-white font-semibold">
-            A
-        </div>
-        <div class="ml-3">
-            <div class="bg-gray-200 p-2 rounded-lg">
-                <p>Hello! How are you?</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-800 text-white h-screen flex flex-col">
+
+    <!-- Chat Container -->
+    <div class="flex-grow p-6 overflow-y-auto space-y-4">
+        <!-- Messages Container -->
+        {% if messages is not none %}
+        {% for message in messages %}
+        <div class="flex items-start space-x-4">
+            <!-- User Avatar -->
+            <img src="https://via.placeholder.com/40" alt="Avatar" class="w-10 h-10 rounded-full border border-gray-700">
+            
+            <!-- Message Content -->
+            <div>
+                <div class="flex items-center space-x-2">
+                    <span class="font-bold text-blue-400">@{{ message.username }}</span>
+                </div>
+                <p class="bg-blue-200 text-black p-3 rounded-lg max-w-xl">{{ message.MessageText }}</p>
             </div>
-            <span class="text-xs text-gray-500">10:00 AM</span>
         </div>
+        {% endfor %}
+        {% endif %}
     </div>
 
-    <!-- Message from Current User -->
-    <div class="flex items-start justify-end mb-4">
-        <div class="mr-3">
-            <div class="bg-blue-500 text-white p-2 rounded-lg">
-                <p>I'm good, thanks! What about you?</p>
-            </div>
-            <span class="text-xs text-gray-500">10:02 AM</span>
-        </div>
-        <div class="w-10 h-10 bg-gray-400 rounded-full flex items-center justify-center text-white font-semibold">
-            Y
-        </div>
-    </div>
-</div>
+</body>
+</html>

@@ -48,7 +48,6 @@ def login():
 @app.route('/logout')
 def logout():
     response = make_response(render_template('logout.html'))
-    session.pop('username', None)
     response.set_cookie('username', '', expires=0)  # Clear the username cookie
     response.set_cookie('jwt', '', expires=0)  # Clear the JWT cookie
     flash('Logged out successfully.', 'info')
@@ -176,11 +175,6 @@ def newchannel():
 
 @app.route('/chat/<uuid>', methods=['GET', 'POST'])
 def chat_channel(uuid):
-    # Only allow access if logged in
-    if 'username' not in session:
-        flash('Please log in to access the chat.', 'warning')
-        return redirect(url_for('login'))
-
     # Fetch channels
     cursor = request.args.get('cursor', 0, type=int)
     response = requests.get(f'http://localhost:2020/channels?cursor={cursor}')
@@ -213,13 +207,18 @@ def chat_channel(uuid):
 
     # Handle form submission for sending a new message
     if request.method == 'POST':
-        message_text = request.form['message']
-        flash(f'Message sent to {current_channel["name"]}: {message_text}', 'success')
+        url = "http://localhost:2020/messages"
+        payload = {
+            "channel_id": uuid,
+            "user_id": request.json['user_id'],
+            "message": request.json['message']
+        }
+        response = requests.post(url, json=payload)
+        return jsonify({}), 201
 
     return render_template(
         'chat.html',
         uuid=uuid,
-        username=session['username'],
         channels=channels,
         current_channel=current_channel,
         messages=messages

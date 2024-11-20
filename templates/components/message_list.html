@@ -10,8 +10,8 @@
 <body class="bg-gray-800 text-white h-screen flex flex-col">
 
     <!-- Chat Container -->
-    <div class="flex-grow p-6 overflow-y-auto space-y-4">
-        <!-- Messages Container -->
+    <div class="flex-grow p-6 overflow-y-auto space-y-4" id="messages-container">
+        <!-- Initial Messages loaded from the server -->
         {% if messages is not none %}
         {% for message in messages %}
         <div class="flex items-start space-x-4">
@@ -29,6 +29,66 @@
         {% endfor %}
         {% endif %}
     </div>
+
+    <script>
+        // WebSocket URL (replace with your actual server WebSocket URL)
+        const socket = new WebSocket("ws://" + document.location.host + "/ws"); 
+
+        // Reference to the message container
+        const messagesContainer = document.getElementById('messages-container');
+
+        // Initialize the channel ID (this should ideally come from your server-side)
+        const channelId = "{{current_channel.uuid}}"; // Replace with actual dynamic channel ID
+
+        // Send initial channel ID to the WebSocket server when the connection is opened
+        socket.addEventListener('open', () => {
+            const initialMessage = JSON.stringify({
+                channel_id: channelId
+            });
+            socket.send(initialMessage);
+        });
+
+        // Listen for incoming messages from the WebSocket server
+        socket.addEventListener('message', (event) => {
+            const message = JSON.parse(event.data);
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('flex', 'items-start', 'space-x-4');
+            
+            // Add user avatar (replace with dynamic data if available)
+            const avatar = document.createElement('img');
+            avatar.src = "https://via.placeholder.com/40";
+            avatar.alt = "Avatar";
+            avatar.classList.add('w-10', 'h-10', 'rounded-full', 'border', 'border-gray-700');
+            
+            // Add message content
+            const messageContent = document.createElement('div');
+            const username = document.createElement('span');
+            username.classList.add('font-bold', 'text-blue-400');
+            username.textContent = `@${message.username}`;  // Replace with dynamic username if available
+
+            const messageText = document.createElement('p');
+            messageText.classList.add('bg-blue-200', 'text-black', 'p-3', 'rounded-lg', 'max-w-xl');
+            messageText.textContent = message.MessageText;
+
+            messageContent.appendChild(username);
+            messageContent.appendChild(messageText);
+            messageElement.appendChild(avatar);
+            messageElement.appendChild(messageContent);
+
+            // Add the message to the chat container
+            messagesContainer.appendChild(messageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;  // Scroll to bottom
+        });
+
+        // Optionally, handle the WebSocket connection close and errors
+        socket.addEventListener('close', () => {
+            console.log('Disconnected from WebSocket server');
+        });
+
+        socket.addEventListener('error', (error) => {
+            console.error('WebSocket Error:', error);
+        });
+    </script>
 
 </body>
 </html>
